@@ -20,45 +20,45 @@ import java.util.stream.Collectors;
 
 public class WorldGuardManager {
 
-	private RFChairs plugin = RFChairs.getInstance();
-	public WorldGuard worldGuard;
-	public WorldGuardPlugin worldGuardPlugin;
-	public RegionContainer container;
-	@SuppressWarnings("rawtypes")
-	public static Flag flag;
+    private RFChairs plugin = RFChairs.getInstance();
+    public WorldGuard worldGuard;
+    public WorldGuardPlugin worldGuardPlugin;
+    public RegionContainer container;
+    @SuppressWarnings("rawtypes")
+    public static Flag flag;
 
-	public WorldGuardManager() {}
-	
-	public void setup() {
-		worldGuard = WorldGuard.getInstance();
-	}
-	
-	public void register() {
-		flag = new StateFlag("allow-seating", true);
-		FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
-	    try {
-	        registry.register(flag);
-	        plugin.log("Custom Flag Registered!");
-	    } catch (FlagConflictException e) {
-	    	plugin.log("Unable to register custom worldguard flag!");
-	    }
-	}
-	
-	public WorldGuardPlugin getWorldGuard() {
-		Plugin plugin = this.plugin.getServer().getPluginManager().getPlugin("WorldGuard");
-		
-		if (!(plugin instanceof WorldGuardPlugin)) return null;
-		return (WorldGuardPlugin) plugin;
-	}
-	
-	public boolean validateSeating(Chair chair, Player player) {
-		double xPos = chair.getLocation().getX();
-		double yPos = chair.getLocation().getY();
-		double zPos = chair.getLocation().getZ();
+    public WorldGuardManager() {}
 
-		WorldGuardManager worldManager = plugin.getWorldGuardManager();
+    public void setup() {
+        worldGuard = WorldGuard.getInstance();
+    }
 
-		LocalPlayer localPlayer = worldManager.getWorldGuard().wrapPlayer(player);
+    public void register() {
+        flag = new StateFlag("allow-seating", true);
+        FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
+        try {
+            registry.register(flag);
+            plugin.log("Custom Flag Registered!");
+        } catch (FlagConflictException e) {
+            plugin.log("Unable to register custom worldguard flag!");
+        }
+    }
+
+    public WorldGuardPlugin getWorldGuard() {
+        Plugin plugin = this.plugin.getServer().getPluginManager().getPlugin("WorldGuard");
+
+        if (!(plugin instanceof WorldGuardPlugin)) return null;
+        return (WorldGuardPlugin) plugin;
+    }
+
+    public boolean validateSeating(Chair chair, Player player) {
+        double xPos = chair.getLocation().getX();
+        double yPos = chair.getLocation().getY();
+        double zPos = chair.getLocation().getZ();
+
+        WorldGuardManager worldManager = plugin.getWorldGuardManager();
+
+        LocalPlayer localPlayer = worldManager.getWorldGuard().wrapPlayer(player);
 
         BlockVector3 vector3 = BlockVector3.at(xPos, yPos, zPos);
 
@@ -70,14 +70,14 @@ public class WorldGuardManager {
 
         return regionSetList.stream()
                 .allMatch(set -> set.testState(localPlayer, (StateFlag) worldManager.getFlag()));
-	}
+    }
 
-	public RegionContainer getContainer() {
-		return worldGuard.getPlatform().getRegionContainer();
-	}
-	
-	public Flag<?> getFlag() {
-		return flag;
-	}
+    public RegionContainer getContainer() {
+        return worldGuard.getPlatform().getRegionContainer();
+    }
+
+    public Flag<?> getFlag() {
+        return flag;
+    }
 
 }

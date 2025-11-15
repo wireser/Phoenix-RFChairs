@@ -19,7 +19,7 @@ import com.rifledluffy.chairs.utility.Util;
 
 public class MessageManager implements Listener {
 	
-	private RFChairs plugin = RFChairs.getPlugin(RFChairs.class);
+	private final RFChairs plugin = RFChairs.getPlugin(RFChairs.class);
 	private ConfigManager configManager = plugin.getConfigManager();
 	public FileConfiguration messages = configManager.getMessages();
 	private boolean allowMessages;
@@ -87,7 +87,7 @@ public class MessageManager implements Listener {
 	
 	void saveMuted() {
 		List<String> ids = new ArrayList<String>();
-		if (muted == null || muted.size() == 0) configManager.getData().set("Muted", new ArrayList<String>());
+		if (muted == null || muted.isEmpty()) configManager.getData().set("Muted", new ArrayList<String>());
 		for (UUID id : muted) ids.add(id.toString());
 		plugin.getServer().getLogger().info("[RFChairs] Saving " + ids.size() + " Players that had events muted.");
 		configManager.getData().set("Muted", ids);
@@ -95,7 +95,7 @@ public class MessageManager implements Listener {
 	
 	void loadMuted() {
 		List<String> muted = configManager.getData().getStringList("Muted");
-		if (muted == null || muted.size() == 0) return;
+		if (muted.isEmpty()) return;
 		plugin.getServer().getLogger().info("[RFChairs] " + muted.size() + " Players had events muted off. Adding Them...");
 		for (String toggler : muted) {
 			UUID id = UUID.fromString(toggler);

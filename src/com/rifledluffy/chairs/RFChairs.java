@@ -9,7 +9,6 @@ import com.rifledluffy.chairs.chairs.BlockFilter;
 import com.rifledluffy.chairs.command.CommandManager;
 import com.rifledluffy.chairs.config.ConfigManager;
 import com.rifledluffy.chairs.managers.WorldGuardManager;
-import com.rifledluffy.chairs.metrics.MetricsLite;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -46,10 +45,7 @@ public class RFChairs extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
-		
-		@SuppressWarnings("unused")
-		MetricsLite metrics = new MetricsLite(this);
-		
+
         commandManager = new CommandManager();
         commandManager.setup();
         

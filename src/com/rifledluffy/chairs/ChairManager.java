@@ -36,7 +36,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -45,10 +44,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.spigotmc.event.entity.EntityDismountEvent;
-
+import org.bukkit.event.entity.EntityDismountEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +56,7 @@ import java.util.stream.Collectors;
 
 public class ChairManager implements Listener {
 	
-	private RFChairs plugin = RFChairs.getPlugin(RFChairs.class);
+	private final RFChairs plugin = RFChairs.getPlugin(RFChairs.class);
 	private ConfigManager configManager = plugin.getConfigManager();
 	private FileConfiguration config = configManager.getConfig();
 	
@@ -74,10 +71,6 @@ public class ChairManager implements Listener {
 	
 	private PotionEffect regenEffect = new PotionEffect(PotionEffectType.REGENERATION, 655200, config.getInt("regen-potency", 0), false, false);
 	private boolean regenWhenSitting;
-	
-	//Update related
-	private boolean disableCurrentUpdate;
-	private boolean disableUpdates;
 	
 	//Kick them off their seat if they take damage
 	private boolean canLaunch;
@@ -116,10 +109,7 @@ public class ChairManager implements Listener {
 		
 		regenEffect = new PotionEffect(PotionEffectType.REGENERATION, 655200, config.getInt("regen-potency", 0), false, false);
 		regenWhenSitting = config.getBoolean("regen-when-sitting", true);
-		
-		disableCurrentUpdate = config.getBoolean("disable-update-message-if-on-latest", false);
-		disableUpdates = config.getBoolean("disable-update-messages", false);
-		
+
 		faceAttacker = config.getBoolean("face-attacker-when-ejected", false);
 		canToss = config.getBoolean("toss-player", false);
 		tossVelocity = config.getDouble("toss-velocity", 0.5D);
@@ -230,9 +220,8 @@ public class ChairManager implements Listener {
 		if (!silent) {
 			MessageEvent messageEvent;
 			MessageEvent otherEvent = null;
-			if (attacker instanceof Player) {
-				Player playerEntity = (Player) attacker;
-				if (info != null && !info.isSprinting()) messageEvent = new MessageEvent(MessageType.TOSSED, MessageConstruct.DEFENSIVE, player, playerEntity);
+			if (attacker instanceof Player playerEntity) {
+                if (info != null && !info.isSprinting()) messageEvent = new MessageEvent(MessageType.TOSSED, MessageConstruct.DEFENSIVE, player, playerEntity);
 				else messageEvent = new MessageEvent(MessageType.TOSSEDSPEED, MessageConstruct.DEFENSIVE, player, playerEntity);
 	
 				if (info != null && !info.isSprinting()) otherEvent = new MessageEvent(MessageType.TOSSING, MessageConstruct.OFFENSIVE, playerEntity, player);
@@ -298,7 +287,7 @@ public class ChairManager implements Listener {
 		} else {
 			Chair chair = Util.getChairFromBlock(block, chairs);
 			if (chair == null) return;
-			if (chair.getFakeSeat() != null && chair.getFakeSeat().getPassengers().size() == 0) {
+			if (chair.getFakeSeat() != null && chair.getFakeSeat().getPassengers().isEmpty()) {
 				chair.setPlayer(player);
 				chair.getFakeSeat().addPassenger(player);
 				if (regenWhenSitting) player.addPotionEffect(regenEffect);
@@ -327,7 +316,7 @@ public class ChairManager implements Listener {
 	
 	@EventHandler
 	public void onRightClick(PlayerInteractEvent event) {
-		if (disabledWorlds.size() > 0 && disabledWorlds.contains(event.getPlayer().getWorld())) return;
+		if (!disabledWorlds.isEmpty() && disabledWorlds.contains(event.getPlayer().getWorld())) return;
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 		if (event.getPlayer().isSneaking()) return;
 		if (event.getHand() != EquipmentSlot.HAND) return;
@@ -564,7 +553,7 @@ public class ChairManager implements Listener {
 	
 	void saveToggled() {
 		List<String> ids = new ArrayList<>();
-		if (toggled == null || toggled.size() == 0) configManager.getData().set("Toggled", new ArrayList<String>());
+		if (toggled == null || toggled.isEmpty()) configManager.getData().set("Toggled", new ArrayList<String>());
 		for (UUID id : toggled) ids.add(id.toString());
 		plugin.getServer().getLogger().info("[RFChairs] Saving " + ids.size() + " Players that had toggled off.");
 		configManager.getData().set("Toggled", ids);
@@ -572,7 +561,7 @@ public class ChairManager implements Listener {
 	
 	void loadToggled() {
 		List<String> toggled = configManager.getData().getStringList("Toggled");
-		if (toggled.size() == 0) return;
+		if (toggled.isEmpty()) return;
 		plugin.getServer().getLogger().info("[RFChairs] " + toggled.size() + " Players had toggled off. Adding Them...");
 
 		toggled.stream()
